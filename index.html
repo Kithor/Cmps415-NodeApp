@@ -2,12 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Mean</title>
+    <title>EMRViewer</title>
     <base href="/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-    <div>Hello World</div>
+    <!-- header -> table view (id, name) -> get/getAll/create -> form -->
+    <button class="accordion">Get EMR</button>
+    <div class="panel">
+        <p>HTTP GET Request: /rest/emr</p>
+        <form action="/rest/emr/id" method="get">
+            
+        </form>
+    </div>
+          
+    <button class="accordion">Get all EMRs</button>
+    <div class="panel">
+        <p>HTTP GET Request: /rest/emr</p>
+    </div>
+          
+    <button class="accordion">Create EMR</button>
+    <div class="panel">
+        <p>HTTP POST Request: /rest/emr</p>
+    </div>
 </body>
 </html>
