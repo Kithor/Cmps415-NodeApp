@@ -1,36 +1,42 @@
 var express = require('express');
-var parse = require('url-parse');
+var urlParser = require('url-parse');
+var bodyParser = require("body-parser");
+var path = require('path');
 var chalk = require('chalk');
 var app = express();
 var router = express.Router();
 
 const port = process.env.PORT || 3000;
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 
-//initial
+
+
+//initial response
+/*app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname + '/index.html'));
+});*/
 app.get('/', (req, res) => {
     res.status(200).send('Hello');
 });
 
-//Test case
-app.get('/test', function (req, res){
-    res.status(200).send('Hello world');
-});
-
 //Get all EMRs
 app.get('/rest/emr', (req,res) => {
-    res.status(200).send(emrs);    //Success status
+    res.status(200).send(data.emrs);    //Success status
 });
 
 //Get a single EMR
 app.get('/rest/emr/id', (req,res) => {
-    var p = parse(req.url, true);
+    var p = urlParser(req.url, true);
     var q = p.query;
     var patient;
     var found = false;
 
-    for(var i=0; i<emrs.EMRS.length;i++){
-        if(emrs.EMRS[i].patientID == q.id){
-            patient = emrs.EMRS[i];
+    for(var i=0; i<data.emrs.length;i++){
+        if(data.emrs[i].id == q.id){
+            patient = data.emrs[i];
             found = true;
         }
     }
@@ -44,16 +50,20 @@ app.get('/rest/emr/id', (req,res) => {
 
 //Post a single EMR
 app.post('/rest/emr', (req,res) => {
-    var p = parse(req.url, true);
-    var q = p.query;
+    console.log(req.body);
+    /*var p = parse(req.url, true);
+    var q = p.query;*/
     let newEMR = {
-        "patientName": q.patientName,        
-        "patientID": q.patientID,
-        "bloodType": q.bloodType
+        "id": req.body.id,        
+        "name": req.body.name,
+        "address": req.body.address,
+        "medications": req.body.medications,
+        "birthdate": req.body.birthdate,
+        "provider": req.body.provider
     };
 
     try{
-        emrs['EMRS'].push(newEMR);
+        data['emrs'].push(newEMR);
         res.status(200).send('Patient was added successfully');
     }
     catch(err){
@@ -71,10 +81,24 @@ app.listen(port, function(err) {
     }
 });
 
-var emrs = '{ "EMRS" : [' +
-'{ "patientName":"Olivier Rusty" , "patientID":"40725" , "bloodType":"O Positive" },' +
-'{ "patientName":"Benjamin Kent" , "patientID":"98123" , "bloodType":"B Negative" },' +
-'{ "patientName":"Julie Rogers" , "patientID":"44199" , "bloodType":"A Positive" },' +
-'{ "patientName":"Alice Smalls" , "patientID":"20164" , "bloodType":"AB Negative" },' +
-'{ "patientName":"Reggie Vence" , "patientID":"44685" , "bloodType":"O Negative" } ]}';
-emrs = JSON.parse(emrs);
+var data = '{"emrs": [{  "id": "0000-44444",' +
+                        '"name": "Monica Latte",' +
+                        '"address": "444 Coffee Ave",' +
+                        '"medications": ["PRINIVIL TABS 20 MG (LISINOPRIL) 1 po qd","HUMULIN INJ 70/30 (INSULIN REG & ISOPHANE (HUMAN)) 20 units ac breakfast"],' +
+                        '"birthdate": "04/04/1950",' +
+                        '"provider": "Dr. Carl Savem"},'+
+                    '{' +   
+                        '"id": "3210-98992",' +
+                        '"name": "Oliver Rusty",' +
+                        '"address": "647 Laural Ave",' +
+                        '"medications": ["Percecet","Xanax"],' +
+                        '"birthdate": "03/16/1992",' +
+                        '"provider": "Dr. Dre"},' +
+                    '{' +   
+                        '"id": "5166-00021",' +
+                        '"name": "Richard Blubber",' +
+                        '"address": "901 Shelby Dr",' +
+                        '"medications": [""],' +
+                        '"birthdate": "10/24/1986",' +
+                        '"provider": "Dr. John Burris"} ]}';
+data = JSON.parse(data);
