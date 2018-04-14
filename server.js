@@ -50,16 +50,16 @@ app.get('/rest/emr/id', (req,res) => {
 
 //Post a single EMR
 app.post('/rest/emr', (req,res) => {
-    console.log(req.body);
-    /*var p = parse(req.url, true);
-    var q = p.query;*/
+    //console.log(req.body);
+    var p = urlParser(req.url, true);
+    var q = p.query;
     let newEMR = {
-        "id": req.body.id,        
-        "name": req.body.name,
-        "address": req.body.address,
-        "medications": req.body.medications,
-        "birthdate": req.body.birthdate,
-        "provider": req.body.provider
+        "id": q.id,        
+        "name": q.name,
+        "address": q.address,
+        "medications": q.medications,
+        "birthdate": q.birthdate,
+        "provider": q.provider
     };
 
     try{
