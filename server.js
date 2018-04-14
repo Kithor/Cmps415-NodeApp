@@ -3,7 +3,7 @@ var chalk = require('chalk');
 var app = express();
 var router = express.Router();
 
-const port = process.env.PORT || 9001;
+const port = process.env.PORT || 3000;
 
 //Test case
 router.get('/test', (req, res) => {
