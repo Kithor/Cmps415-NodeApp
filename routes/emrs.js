@@ -1,5 +1,9 @@
 var router = require('express').Router(),
-    urlParser = require('url-parse')
+    urlParser = require('url-parse'),
+    bodyParser = require('body-parser')
+
+//Note: we use this parser because we are using postman urlencoded bodies
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 /*---------------------- GET Requests ----------------------*/
 //get all emrs
@@ -51,9 +55,10 @@ router.get('/name', (req,res) => {
 
 /*---------------------- Post Requests ----------------------*/
 //post new emr
-router.post('/', (req,res) => {
+router.post('/', urlencodedParser, (req,res) => {
+    console.log(req.body)
     let newEMR = {
-        "id": req.body.id,        
+        "id": req.body.id,
         "name": req.body.name,
         "address": req.body.address,
         "medications": req.body.medications,
@@ -61,12 +66,15 @@ router.post('/', (req,res) => {
         "provider": req.body.provider
     };
 
-    try{
-        data['emrs'].push(newEMR);
-        res.status(200).send('Patient was added successfully');
-    }
-    catch(err){
-        res.status(406).send('Something went wrong');
+    console.log(newEMR);
+    if(newEMR != undefined){
+        try{
+            data['emrs'].push(newEMR);
+            res.status(200).send('Patient was added successfully');
+        }
+        catch(err){
+            res.status(406).send('Something went wrong');
+        }
     }
 });
 
@@ -82,6 +90,7 @@ router.delete('/', (req,res) => {
 
 
 /*---------------------- Temporary Data ----------------------*/
+//Move data to MongoDB, set up DB calls in model folder
 var data = '{"emrs": [{  "id": "0000-44444",' +
                         '"name": "Monica Latte",' +
                         '"address": "444 Coffee Ave",' +
