@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/Kithor/Cmps415-NodeApp#readme",
   "dependencies": {
-    "chalk": "^2.3.2",
+    "ejs": "^2.5.8",
     "express": "^4.16.3",
-    "url-parse": "^1.3.0"
+    "url-parse": "^1.4.0"
   }
 }
