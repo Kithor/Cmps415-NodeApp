@@ -56,7 +56,7 @@ router.post('/', jsonParser, (req,res) => {
         "birthdate": req.body.birthdate,
         "provider": req.body.provider
     })
-    console.log(newEMR);
+    //console.log(newEMR);
 
     EMR.addEmr(newEMR, (err) => {
         if(err){
@@ -69,13 +69,41 @@ router.post('/', jsonParser, (req,res) => {
 });
 
 /*---------------------- Put Requests ----------------------*/
-router.put('/', jsonParser, (req,res) => {
-    //Needs to be finished
+router.put('/id', jsonParser, (req,res) => {
+    var updtEMR
+    //console.log(req.body)
+    
+    if(req.body.hasOwnProperty("id")) {
+        updtEMR = {id: req.body.id}
+    } else {
+        res.send('ID is required to update a patient')
+    }
+    
+    if(req.body.hasOwnProperty("name")){ updtEMR.name = req.body.name }
+    if(req.body.hasOwnProperty("address")){ updtEMR.address = req.body.address }
+    if(req.body.hasOwnProperty("medications")){ updtEMR.medications = req.body.medications }
+    if(req.body.hasOwnProperty("birthdate")){ updtEMR.birthdate = req.body.birthdate }
+    if(req.body.hasOwnProperty("provider")){ updtEMR.provider = req.body.provider }
+
+    //console.log(updtEMR)
+
+    EMR.updateEmr(updtEMR, (err) => {
+        if(err){
+            console.log(err)
+            res.status(406).send('Something went wrong');
+        } else {
+            res.status(200).send('Patient was updated successfully')
+        }
+    })
 });
 
 /*---------------------- Delete Requests ----------------------*/
-router.delete('/', jsonParser, (req,res) => {
-    var id = req.body.id
+router.delete('/id', jsonParser, (req,res) => {
+    if(req.body.hasOwnProperty("id")) {
+        var id = req.body.id
+    } else {
+        res.send('ID is required to delete a patient')
+    }
 
     EMR.removeEmrById(id, (err) => {
         if(err){
