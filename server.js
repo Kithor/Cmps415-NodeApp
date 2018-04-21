@@ -1,18 +1,29 @@
 var express = require('express'),
   path = require('path'),
-  emrs = require('./routes/emrs')
   mongoose = require('mongoose');
 
+const config = require('./config/database');
+const api = require('./routes/api')
 const port = process.env.PORT || 3000;
 
 const app = express()
 const router = express.Router()
 
-//set up DB connection (set up DB first)
+/*---------------------- DB Connection ----------------------*/
+mongoose.connect(config.database);
 
-//Include route to emr schema, ('/api/emrs') located in ./models/emrs
+//On Connection
+mongoose.connection.on('connected', () => {
+	console.log('Connected to database');
+});
 
-app.use('/rest/emr', emrs);
+//ON Error
+mongoose.connection.on('error', (err) => {
+	console.log('Database error ' + err);
+});
+
+/*---------------------- Middleware ----------------------*/
+app.use('/rest/emr', api);
 //app.set('view engine', 'ejs'); For if we decide to use EJS
 
 app.listen(port, function(err) {
