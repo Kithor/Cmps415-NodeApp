@@ -23,7 +23,7 @@ router.get('/id', (req,res) => {
 
     EMR.getEmrById(id, (err, emr) => {
         if(err){
-            res.status(404).send('Patient not found'); //Fail status
+            res.status(404).send(err); //Fail status
         }
         else{
             res.status(200).send(emr);

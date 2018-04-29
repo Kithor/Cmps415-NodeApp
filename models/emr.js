@@ -23,6 +23,13 @@ const EMRSchema = new Schema({
 	},
 	provider: {
 		type: String
+	},
+	lock: {
+		type: Boolean,
+		default: false
+	},
+	ts: {
+		type: Date
 	}
 });
 
@@ -33,13 +40,30 @@ EMRSchema.statics.getEmrs = function (callback){
 };
 
 //get EMR by id
-EMRSchema.statics.getEmrById = function(id,callback){
+EMRSchema.statics.getEmrById = function(id, callback){
 	const query = {id: id};
-	EMR.findOne(query, callback);
+	EMR.findOne(query, (err, emr) => {
+		var mes
+		if(err){
+			mes = "Failed to find record"
+		}
+		if(emr.lock = true){
+			mes = "The record is currently locked"
+		}
+		emr.lock = true
+		emr.ts = new Date()
+		EMR.find(query).update({$set: emr}, (err) => {
+			if(err){
+				mes = "Failed to lock the record"
+			}
+		})
+		console.log(emr)
+		callback(mes, emr)
+	})
 };
 
 //get EMR by name
-EMRSchema.statics.getEmrByName = function(name,callback){
+EMRSchema.statics.getEmrByName = function(name, callback){
 	const query = {name: name};
 	EMR.findOne(query, callback);
 };
@@ -57,6 +81,7 @@ EMRSchema.statics.addEmr = function (newEmr, callback) {
 
 //update existing EMR
 EMRSchema.statics.updateEmr = function (updtEmr, callback) {
+	updtemr.lock = false
 	EMR.find({id: updtEmr.id}).update({$set: updtEmr}, callback)
 }
 
