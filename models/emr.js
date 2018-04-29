@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const config = require('../config/database');
 const Schema = require('mongoose').Schema;
+const lock = require('./lock')
 
 const EMRSchema = new Schema({
 	id: {
@@ -23,13 +24,6 @@ const EMRSchema = new Schema({
 	},
 	provider: {
 		type: String
-	},
-	lock: {
-		type: Boolean,
-		default: false
-	},
-	ts: {
-		type: Date
 	}
 });
 
@@ -42,23 +36,32 @@ EMRSchema.statics.getEmrs = function (callback){
 //get EMR by id
 EMRSchema.statics.getEmrById = function(id, callback){
 	const query = {id: id};
-	EMR.findOne(query, (err, emr) => {
-		var mes
+	var mes, emr
+	EMR.findOne(query, (err, emr) =>{									//find record
 		if(err){
-			mes = "Failed to find record"
+			mes = "Could not retrieve record"
 		}
-		if(emr.lock = true){
-			mes = "The record is currently locked"
+		else{
+			lock.getLockById(emr._id, (err, lk) => {
+				if(err){
+					mes = "Could not retrieve lock information"
+					callback(mes)
+				}
+				else if(lk != null){									//check if lock is in place
+					mes = "The record is locked"
+					callback(mes)
+				}
+				else{													//create lock and return record
+					lock.createLock(emr._id, (err) => {
+						if(err){
+							mes = "Could not lock the record"
+							callback(mes)
+						}
+						callback(mes, emr)
+					})
+				}
+			})
 		}
-		emr.lock = true
-		emr.ts = new Date()
-		EMR.find(query).update({$set: emr}, (err) => {
-			if(err){
-				mes = "Failed to lock the record"
-			}
-		})
-		console.log(emr)
-		callback(mes, emr)
 	})
 };
 
@@ -81,8 +84,13 @@ EMRSchema.statics.addEmr = function (newEmr, callback) {
 
 //update existing EMR
 EMRSchema.statics.updateEmr = function (updtEmr, callback) {
-	updtemr.lock = false
-	EMR.find({id: updtEmr.id}).update({$set: updtEmr}, callback)
+	EMR.findOne({id: updtEmr.id}, (err, emr) => {
+		lock.removeLock(emr._id, (err) => {
+			if (err) {
+				console.log(err)
+			}
+		})
+	}).update({$set: updtEmr}, callback)
 }
 
 const EMR = module.exports = mongoose.model('EMR', EMRSchema);

@@ -8,7 +8,7 @@ var jsonParser = bodyParser.json()
 
 /*---------------------- GET Requests ----------------------*/
 //get all emrs
-router.get('/', (req,res) => {
+router.get('/', (req, res) => {
     EMR.getEmrs(function(err, emrs){
 		if(err) {
 			throw err;
@@ -18,11 +18,12 @@ router.get('/', (req,res) => {
 });
 
 //get one emr by id
-router.get('/id', (req,res) => {
+router.get('/id', (req, res) => {
     var id = urlParser(req.url, true).query.id;
 
     EMR.getEmrById(id, (err, emr) => {
         if(err){
+            console.log(err)
             res.status(404).send(err); //Fail status
         }
         else{
@@ -32,7 +33,7 @@ router.get('/id', (req,res) => {
 });
 
 //get one emr by name
-router.get('/name', (req,res) => {
+router.get('/name', (req, res) => {
     var name = urlParser(req.url, true).query.name;
 
     EMR.getEmrByName(name, (err, emr) => {
@@ -47,7 +48,7 @@ router.get('/name', (req,res) => {
 
 /*---------------------- Post Requests ----------------------*/
 //post new emr
-router.post('/', jsonParser, (req,res) => {
+router.post('/', jsonParser, (req, res) => {
     let newEMR = new EMR({
         "id": req.body.id,
         "name": req.body.name,
@@ -69,7 +70,7 @@ router.post('/', jsonParser, (req,res) => {
 });
 
 /*---------------------- Put Requests ----------------------*/
-router.put('/id', jsonParser, (req,res) => {
+router.put('/id', jsonParser, (req, res) => {
     var updtEMR
     //console.log(req.body)
     
@@ -92,7 +93,7 @@ router.put('/id', jsonParser, (req,res) => {
             console.log(err)
             res.status(406).send('Something went wrong');
         } else {
-            res.status(200).send('Patient was updated successfully')
+            res.status(200).send('Patient was updated successfully and unlocked')
         }
     })
 });
